@@ -1,0 +1,47 @@
+{
+  "name": "sorex-query-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Query API (GraphQL + REST + subscriptions) and published @stellar-sorex/sdk client for indexed Soroban events.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @stellar-sorex/sdk && npm run build --workspace @stellar-sorex/api",
+    "dev": "npm run dev --workspace @stellar-sorex/api",
+    "start": "node packages/api/dist/server.js",
+    "migrate": "npm run migrate --workspace @stellar-sorex/api",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.7",
+    "@eslint/js": "^9.39.1",
+    "@stellar-sorex/sdk": "0.1.0",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^24.10.0",
+    "@types/pg": "^8.15.6",
+    "@types/ws": "^8.18.2",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^5.1.0"
+  }
+}

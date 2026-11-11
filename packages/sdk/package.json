@@ -1,0 +1,55 @@
+{
+  "name": "@stellar-sorex/sdk",
+  "version": "0.1.0",
+  "description": "Typed JavaScript/TypeScript client for the Stellar-Sorex query API (GraphQL queries and subscriptions).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "stellar",
+    "soroban",
+    "events",
+    "graphql",
+    "indexer",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ojuotimi932/sorex-query-sdk",
+    "directory": "packages/sdk"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "graphql": "^16.11.0",
+    "graphql-ws": "^6.4.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}

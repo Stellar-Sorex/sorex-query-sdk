@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+data/
+.env
+.env.*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+*.tsbuildinfo
+.changeset/*.md
+!.changeset/README.md
+.DS_Store
