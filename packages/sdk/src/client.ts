@@ -175,9 +175,7 @@ export class SorexClient {
       });
     }
     this.#httpUrl = options.url.replace(/\/+$/, "");
-    this.#wsUrl =
-      options.websocketUrl ??
-      `${this.#httpUrl.replace(/^http/, "ws")}/graphql`;
+    this.#wsUrl = options.websocketUrl ?? `${this.#httpUrl.replace(/^http/, "ws")}/graphql`;
     this.#apiKey = options.apiKey;
     this.#headers = options.headers ?? {};
     this.#timeoutMs = options.timeoutMs ?? 15_000;
@@ -239,7 +237,9 @@ export class SorexClient {
 
   async #contracts(search?: string, limit?: number): Promise<SorexContract[]> {
     return this.#request(CONTRACTS_QUERY, compact({ search, limit }), (value) =>
-      (value as { contracts: unknown[] }).contracts.map((contract) => contractSchema.parse(contract)),
+      (value as { contracts: unknown[] }).contracts.map((contract) =>
+        contractSchema.parse(contract),
+      ),
     );
   }
 
@@ -285,7 +285,10 @@ export class SorexClient {
           cause: error,
         });
       }
-      throw new SorexApiError("Could not reach the Sorex API", { code: "NETWORK_ERROR", cause: error });
+      throw new SorexApiError("Could not reach the Sorex API", {
+        code: "NETWORK_ERROR",
+        cause: error,
+      });
     } finally {
       clearTimeout(timer);
     }
@@ -302,11 +305,14 @@ export class SorexClient {
     }
 
     if (!response.ok) {
-      throw new SorexApiError(payload.errors?.[0]?.message ?? `API returned HTTP ${response.status}`, {
-        status: response.status,
-        code: payload.errors?.[0]?.extensions?.code ?? "HTTP_ERROR",
-        details: payload.errors,
-      });
+      throw new SorexApiError(
+        payload.errors?.[0]?.message ?? `API returned HTTP ${response.status}`,
+        {
+          status: response.status,
+          code: payload.errors?.[0]?.extensions?.code ?? "HTTP_ERROR",
+          details: payload.errors,
+        },
+      );
     }
     if (payload.errors && payload.errors.length > 0) {
       const first = payload.errors[0]!;
@@ -316,7 +322,9 @@ export class SorexClient {
       });
     }
     if (payload.data === undefined || payload.data === null) {
-      throw new SorexApiError("API returned an empty GraphQL response", { code: "INVALID_RESPONSE" });
+      throw new SorexApiError("API returned an empty GraphQL response", {
+        code: "INVALID_RESPONSE",
+      });
     }
 
     try {
@@ -367,7 +375,11 @@ export class SorexClient {
           },
           error: (error) => {
             handlers.onError?.(
-              new SorexApiError("Event subscription failed", { code: "SUBSCRIPTION_ERROR", details: error, cause: error }),
+              new SorexApiError("Event subscription failed", {
+                code: "SUBSCRIPTION_ERROR",
+                details: error,
+                cause: error,
+              }),
             );
           },
           complete: () => handlers.onComplete?.(),

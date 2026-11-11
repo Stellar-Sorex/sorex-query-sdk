@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 /** Recursive JSON value (decoded SCVal data). */
-export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonValue =
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 export const jsonSchema: z.ZodType<JsonValue> = z.lazy(() =>
   z.union([

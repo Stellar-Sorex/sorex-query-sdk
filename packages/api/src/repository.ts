@@ -1,5 +1,11 @@
 import { sql, type Kysely } from "kysely";
-import type { Database, ContractsTable, EventsTable, TokenTransfersTable, TransactionsTable } from "./db.js";
+import type {
+  Database,
+  ContractsTable,
+  EventsTable,
+  TokenTransfersTable,
+  TransactionsTable,
+} from "./db.js";
 import { CursorError } from "./errors.js";
 import type {
   ContractRecord,
@@ -59,9 +65,10 @@ function parseJson(value: unknown, fallback: JsonValue): JsonValue {
 
 /** Opaque, order-bound keyset cursor. */
 export function encodeCursor(order: Order, ledger: number, id: string): string {
-  return Buffer.from(JSON.stringify({ order, ledger, id } satisfies CursorPayload), "utf8").toString(
-    "base64url",
-  );
+  return Buffer.from(
+    JSON.stringify({ order, ledger, id } satisfies CursorPayload),
+    "utf8",
+  ).toString("base64url");
 }
 
 export function decodeCursor(cursor: string, expectedOrder: Order): CursorPayload {
@@ -163,7 +170,11 @@ export class Repository {
   }
 
   async getEvent(id: string): Promise<EventRecord | null> {
-    const row = await this.#db.selectFrom("events").selectAll().where("id", "=", id).executeTakeFirst();
+    const row = await this.#db
+      .selectFrom("events")
+      .selectAll()
+      .where("id", "=", id)
+      .executeTakeFirst();
     return row ? this.#mapEvent(row) : null;
   }
 
@@ -254,15 +265,24 @@ export class Repository {
       lastSeenLedger: num(contract.last_seen_ledger),
       eventCount: num(contract.event_count),
       transferCount: num(transferRow?.count ?? 0),
-      latestLedger: latestRow?.max_ledger === null || latestRow?.max_ledger === undefined ? null : num(latestRow.max_ledger),
-      eventNames: nameRows.map((row) => ({ name: row.event_name ?? "unknown", count: num(row.count) })),
+      latestLedger:
+        latestRow?.max_ledger === null || latestRow?.max_ledger === undefined
+          ? null
+          : num(latestRow.max_ledger),
+      eventNames: nameRows.map((row) => ({
+        name: row.event_name ?? "unknown",
+        count: num(row.count),
+      })),
     };
   }
 
   async listContracts(search: string | undefined, limit = 20): Promise<ContractRecord[]> {
     let query = this.#db.selectFrom("contracts").selectAll();
     if (search) query = query.where("contract_id", "like", `${search}%`);
-    const rows = await query.orderBy("event_count", "desc").limit(Math.min(limit, this.#maxPageSize)).execute();
+    const rows = await query
+      .orderBy("event_count", "desc")
+      .limit(Math.min(limit, this.#maxPageSize))
+      .execute();
     return Promise.all(
       rows.map(async (row) => ({
         contractId: row.contract_id,
@@ -435,6 +455,10 @@ export class Repository {
   }
 
   async getRawContract(contractId: string): Promise<ContractsTable | undefined> {
-    return this.#db.selectFrom("contracts").selectAll().where("contract_id", "=", contractId).executeTakeFirst();
+    return this.#db
+      .selectFrom("contracts")
+      .selectAll()
+      .where("contract_id", "=", contractId)
+      .executeTakeFirst();
   }
 }

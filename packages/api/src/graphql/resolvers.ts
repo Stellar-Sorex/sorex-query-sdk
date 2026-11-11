@@ -130,8 +130,11 @@ export const resolvers = {
       context.repository.getEvent(args.id),
     contract: (_root: unknown, args: { contractId: string }, context: GraphQLContext) =>
       context.repository.getContract(args.contractId),
-    contracts: (_root: unknown, args: { search?: string; limit?: number }, context: GraphQLContext) =>
-      context.repository.listContracts(args.search, args.limit),
+    contracts: (
+      _root: unknown,
+      args: { search?: string; limit?: number },
+      context: GraphQLContext,
+    ) => context.repository.listContracts(args.search, args.limit),
     tokenTransfers: (_root: unknown, args: TransferListArgs, context: GraphQLContext) => {
       const key = `gql:transfers:${JSON.stringify(args)}`;
       return cached(context.cache, key, cacheTtl(context.config), () =>

@@ -2,7 +2,8 @@ export type Dialect = "postgres" | "sqlite";
 export type Order = "asc" | "desc";
 
 /** JSON-safe data decoded by the indexer. */
-export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonValue =
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 export interface EventFilters {
   contractId?: string;

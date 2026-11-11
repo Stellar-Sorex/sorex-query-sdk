@@ -9,6 +9,4 @@ data/
 *.db-shm
 *.db-wal
 *.tsbuildinfo
-.changeset/*.md
-!.changeset/README.md
 .DS_Store

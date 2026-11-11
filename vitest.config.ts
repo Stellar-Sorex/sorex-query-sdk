@@ -10,7 +10,12 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       include: ["packages/api/src/**", "packages/sdk/src/**"],
-      exclude: ["**/index.ts", "**/types.ts", "packages/api/src/server.ts", "packages/api/src/cli.ts"],
+      exclude: [
+        "**/index.ts",
+        "**/types.ts",
+        "packages/api/src/server.ts",
+        "packages/api/src/cli.ts",
+      ],
       thresholds: {
         lines: 70,
         statements: 70,

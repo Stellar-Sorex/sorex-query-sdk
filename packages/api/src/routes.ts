@@ -101,7 +101,10 @@ function transferQuerySchema(config: ApiConfig): Record<string, unknown> {
   };
 }
 
-function parsePage(query: PageQuery, fallbackOrder: Order = "desc"): { first: number; after?: string; order: Order } {
+function parsePage(
+  query: PageQuery,
+  fallbackOrder: Order = "desc",
+): { first: number; after?: string; order: Order } {
   return {
     first: query.limit ?? 20,
     ...(query.cursor ? { after: query.cursor } : {}),
@@ -207,7 +210,10 @@ export async function registerRoutes(app: FastifyInstance, deps: RouteDependenci
           repository.listEvents({ contractId: contract.contractId }, { first: 10, order: "desc" }),
         ),
         cached(cache, `${key}:transfers`, ttl, () =>
-          repository.listTransfers({ contractId: contract.contractId }, { first: 10, order: "desc" }),
+          repository.listTransfers(
+            { contractId: contract.contractId },
+            { first: 10, order: "desc" },
+          ),
         ),
       ]);
       return { contract, events, transfers };
@@ -273,7 +279,10 @@ export async function registerRoutes(app: FastifyInstance, deps: RouteDependenci
         repository.getTransaction(request.params.txHash),
       );
       const events = await cached(cache, `${key}:events`, ttl, () =>
-        repository.listEvents({ txHash: request.params.txHash }, { first: config.MAX_PAGE_SIZE, order: "asc" }),
+        repository.listEvents(
+          { txHash: request.params.txHash },
+          { first: config.MAX_PAGE_SIZE, order: "asc" },
+        ),
       );
       if (!transaction && events.nodes.length === 0) {
         throw new NotFoundError("Transaction not indexed");
@@ -289,8 +298,7 @@ export async function registerRoutes(app: FastifyInstance, deps: RouteDependenci
               memoryBytesMeasured: transaction.memoryBytes,
               readBytesDeclared: transaction.readBytes,
               writeBytesDeclared: transaction.writeBytes,
-              note:
-                "CPU/read/write values are declared envelope limits; memory bytes are not exposed by public RPC.",
+              note: "CPU/read/write values are declared envelope limits; memory bytes are not exposed by public RPC.",
             }
           : null,
       };
@@ -356,7 +364,9 @@ export async function registerRoutes(app: FastifyInstance, deps: RouteDependenci
       }
       if (/^[0-9a-f]{64}$/i.test(q)) {
         result.transaction = await repository.getTransaction(q);
-        result.events = (await repository.listEvents({ txHash: q }, { first: 20, order: "asc" })).nodes;
+        result.events = (
+          await repository.listEvents({ txHash: q }, { first: 20, order: "asc" })
+        ).nodes;
         return result;
       }
       if (/^C[A-Z2-7]{55}$/.test(q)) {

@@ -5,7 +5,10 @@ import type { HealthRecord } from "./types.js";
 export const VERSION = "0.1.0";
 
 /** Build the shared REST/GraphQL health payload from indexed data. */
-export async function buildHealth(repository: Repository, config: ApiConfig): Promise<HealthRecord> {
+export async function buildHealth(
+  repository: Repository,
+  config: ApiConfig,
+): Promise<HealthRecord> {
   const [latestLedger, indexedEvents, indexedContracts, lastIndexedAt] = await Promise.all([
     repository.latestEventLedger(),
     repository.countEvents(),

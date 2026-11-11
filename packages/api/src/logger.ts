@@ -8,14 +8,23 @@ export function createLogger(level: string, pretty = false): Logger {
     level,
     base: { service: "sorex-query-sdk" },
     redact: {
-      paths: ["databaseUrl", "redisUrl", "*.databaseUrl", "*.redisUrl", "req.headers.authorization"],
+      paths: [
+        "databaseUrl",
+        "redisUrl",
+        "*.databaseUrl",
+        "*.redisUrl",
+        "req.headers.authorization",
+      ],
       censor: "[redacted]",
     },
   };
   if (pretty) {
     return pino({
       ...options,
-      transport: { target: "pino-pretty", options: { colorize: true, translateTime: "SYS:standard" } },
+      transport: {
+        target: "pino-pretty",
+        options: { colorize: true, translateTime: "SYS:standard" },
+      },
     });
   }
   return pino(options);

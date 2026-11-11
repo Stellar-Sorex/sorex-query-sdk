@@ -47,7 +47,10 @@ describe("query API", () => {
   });
 
   it("lists events with filters and cursor pagination", async () => {
-    const firstPage = await bundle.app.inject({ method: "GET", url: "/v1/events?limit=2&order=asc" });
+    const firstPage = await bundle.app.inject({
+      method: "GET",
+      url: "/v1/events?limit=2&order=asc",
+    });
     expect(firstPage.statusCode).toBe(200);
     const first = firstPage.json() as {
       nodes: { id: string; ledger: number }[];
@@ -61,7 +64,10 @@ describe("query API", () => {
       url: `/v1/events?limit=2&order=asc&cursor=${first.pageInfo.endCursor}`,
     });
     expect(secondPage.statusCode).toBe(200);
-    const second = secondPage.json() as { nodes: { id: string }[]; pageInfo: { hasNextPage: boolean } };
+    const second = secondPage.json() as {
+      nodes: { id: string }[];
+      pageInfo: { hasNextPage: boolean };
+    };
     expect(second.nodes.map((node) => node.id)).toEqual([
       "0000000000000000101-0000000001",
       "0000000000000000102-0000000000",
@@ -107,7 +113,12 @@ describe("query API", () => {
     expect(event.statusCode).toBe(200);
     expect(event.json()).toMatchObject({
       id: "0000000000000000100-0000000000",
-      topicsJson: ["transfer", FROM, "GBTQA6F4QWMC4IK7L4NO5H57J336NM7UB4GGZEZTGSGKWPX2DYVPBRY6", "native"],
+      topicsJson: [
+        "transfer",
+        FROM,
+        "GBTQA6F4QWMC4IK7L4NO5H57J336NM7UB4GGZEZTGSGKWPX2DYVPBRY6",
+        "native",
+      ],
       transfer: { amount: "20000000", asset: "native" },
     });
 
@@ -121,7 +132,10 @@ describe("query API", () => {
       contract: { contractId: CONTRACT_A, eventCount: 2, transferCount: 2 },
     });
 
-    const transaction = await bundle.app.inject({ method: "GET", url: `/v1/transactions/${TX_HASH}` });
+    const transaction = await bundle.app.inject({
+      method: "GET",
+      url: `/v1/transactions/${TX_HASH}`,
+    });
     expect(transaction.statusCode).toBe(200);
     expect(transaction.json()).toMatchObject({
       transaction: { feeCharged: "100", cpuInstructions: 1_000_000, memoryBytes: null },
@@ -181,7 +195,12 @@ describe("query API", () => {
     });
     expect(response.statusCode).toBe(200);
     const body = response.json() as {
-      data: { events: { nodes: { id: string; eventName: string; transfer: null }[]; pageInfo: { hasNextPage: boolean } } };
+      data: {
+        events: {
+          nodes: { id: string; eventName: string; transfer: null }[];
+          pageInfo: { hasNextPage: boolean };
+        };
+      };
     };
     expect(body.data.events.nodes).toHaveLength(2);
     expect(body.data.events.nodes[0]).toMatchObject({ eventName: "approve", transfer: null });
@@ -211,7 +230,9 @@ describe("query API", () => {
   });
 
   it("rejects queries above the complexity budget and bad depths", async () => {
-    const aliases = Array.from({ length: 320 }, (_, index) => `a${index}: health { status }`).join("\n");
+    const aliases = Array.from({ length: 320 }, (_, index) => `a${index}: health { status }`).join(
+      "\n",
+    );
     const response = await bundle.app.inject({
       method: "POST",
       url: "/graphql",
@@ -233,7 +254,9 @@ describe("query API", () => {
     const nestedBody = nested.json() as {
       data: { events: { nodes: { id: string; transfer: { eventId: string } }[] } };
     };
-    expect(nestedBody.data.events.nodes[0]?.transfer.eventId).toBe(nestedBody.data.events.nodes[0]?.id);
+    expect(nestedBody.data.events.nodes[0]?.transfer.eventId).toBe(
+      nestedBody.data.events.nodes[0]?.id,
+    );
   });
 
   it("streams new events to a GraphQL subscription", async () => {
@@ -248,7 +271,10 @@ describe("query API", () => {
 
     const received: { id: string; contractId: string }[] = [];
     const done = new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("timed out waiting for subscription event")), 8_000);
+      const timer = setTimeout(
+        () => reject(new Error("timed out waiting for subscription event")),
+        8_000,
+      );
       timer.unref?.();
       client.subscribe<{ events: { id: string; contractId: string } }>(
         {
@@ -276,7 +302,12 @@ describe("query API", () => {
     await insertLiveEvent(bundle.repository);
     await done;
     expect(received).toEqual([
-      { id: "0000000000000000103-0000000000", contractId: CONTRACT_A, ledger: 103, eventName: "transfer" },
+      {
+        id: "0000000000000000103-0000000000",
+        contractId: CONTRACT_A,
+        ledger: 103,
+        eventName: "transfer",
+      },
     ]);
 
     await client.dispose();
@@ -288,7 +319,12 @@ describe("query API", () => {
     const document = openapi.json() as { paths: Record<string, unknown>; info: { title: string } };
     expect(document.info.title).toBe("Stellar-Sorex Query API");
     expect(Object.keys(document.paths)).toEqual(
-      expect.arrayContaining(["/v1/events", "/v1/token-transfers", "/v1/transactions/{txHash}", "/v1/search"]),
+      expect.arrayContaining([
+        "/v1/events",
+        "/v1/token-transfers",
+        "/v1/transactions/{txHash}",
+        "/v1/search",
+      ]),
     );
 
     const docs = await bundle.app.inject({ method: "GET", url: "/docs/" });
@@ -299,7 +335,9 @@ describe("query API", () => {
 
 describe("rate limiting", () => {
   it("returns 429 after the per-key budget", async () => {
-    const bundle = await buildApp(testConfig({ RATE_LIMIT_MAX: "2", SUBSCRIPTION_POLL_MS: "1000" }));
+    const bundle = await buildApp(
+      testConfig({ RATE_LIMIT_MAX: "2", SUBSCRIPTION_POLL_MS: "1000" }),
+    );
     try {
       const first = await bundle.app.inject({ method: "GET", url: "/v1/events" });
       const second = await bundle.app.inject({ method: "GET", url: "/v1/events" });
@@ -316,7 +354,11 @@ describe("rate limiting", () => {
   it("uses the API key as the rate-limit key", async () => {
     const bundle = await buildApp(testConfig({ RATE_LIMIT_MAX: "1" }));
     try {
-      await bundle.app.inject({ method: "GET", url: "/v1/events", headers: { "x-api-key": "aaa" } });
+      await bundle.app.inject({
+        method: "GET",
+        url: "/v1/events",
+        headers: { "x-api-key": "aaa" },
+      });
       const otherKey = await bundle.app.inject({
         method: "GET",
         url: "/v1/events",

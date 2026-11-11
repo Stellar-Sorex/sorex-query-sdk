@@ -96,9 +96,7 @@ describe("SorexClient", () => {
         return;
       }
       if (body.query.includes("query Event(")) {
-        response.end(
-          JSON.stringify({ data: { event: { ...EVENT, transfer: null } } }),
-        );
+        response.end(JSON.stringify({ data: { event: { ...EVENT, transfer: null } } }));
         return;
       }
       if (body.query.includes("query Health")) {

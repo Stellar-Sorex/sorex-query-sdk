@@ -94,7 +94,11 @@ export class EventFeed {
     this.#polling = true;
     try {
       for (;;) {
-        const events = await this.#options.repository.listEventsAfter(this.#lastLedger, this.#lastId, 100);
+        const events = await this.#options.repository.listEventsAfter(
+          this.#lastLedger,
+          this.#lastId,
+          100,
+        );
         if (events.length === 0) return;
         for (const event of events) this.#publish(event);
         const last = events.at(-1)!;
@@ -117,7 +121,10 @@ export class EventFeed {
       const oldest = this.#seenOrder.shift();
       if (oldest) this.#seen.delete(oldest);
     }
-    if (event.ledger > this.#lastLedger || (event.ledger === this.#lastLedger && event.id > this.#lastId)) {
+    if (
+      event.ledger > this.#lastLedger ||
+      (event.ledger === this.#lastLedger && event.id > this.#lastId)
+    ) {
       this.#lastLedger = event.ledger;
       this.#lastId = event.id;
     }

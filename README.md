@@ -24,10 +24,10 @@ flowchart LR
   UI -->|npm dependency| SDK
 ```
 
-| Package | Purpose |
-| --- | --- |
+| Package        | Purpose                                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `packages/api` | Fastify server: GraphQL (Mercurius), REST + OpenAPI at `/docs`, graphql-ws subscriptions, rate limiting, LRU/Redis caching. |
-| `packages/sdk` | `@stellar-sorex/sdk`: typed browser/Node client with zod-validated responses and live subscriptions. |
+| `packages/sdk` | `@stellar-sorex/sdk`: typed browser/Node client with zod-validated responses and live subscriptions.                        |
 
 ## Quickstart
 
@@ -53,17 +53,17 @@ The API creates its own migration table (`sorex_query_migrations`) and uses
 
 ## REST
 
-| Method | Path | Description |
-| --- | --- | --- |
-| GET | `/v1/events` | Filter by `contractId`, `topic0`–`topic3`, `ledgerFrom`, `ledgerTo`, `txHash`, `type`, `eventName`, `timeFrom`, `timeTo`; `limit`, `cursor`, `order`. |
-| GET | `/v1/events/:id` | Event plus normalised transfer, when applicable. |
-| GET | `/v1/contracts/:contractId` | Contract stats, event-name counts, recent events and transfers. |
-| GET | `/v1/contracts/:contractId/events` | Contract event stream with the same filters. |
-| GET | `/v1/token-transfers` | SEP-41 transfers by `contractId`, `from`, `to`, `asset`. |
-| GET | `/v1/transactions/:txHash` | Transaction fee/resource metadata and all events in the transaction. |
-| GET | `/v1/ledgers/:sequence` | Per-ledger counts and fees charged. |
-| GET | `/v1/search?q=` | Contract ID, transaction hash, ledger sequence or event ID. |
-| GET | `/v1/health` | Index freshness and API health. |
+| Method | Path                               | Description                                                                                                                                           |
+| ------ | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/v1/events`                       | Filter by `contractId`, `topic0`–`topic3`, `ledgerFrom`, `ledgerTo`, `txHash`, `type`, `eventName`, `timeFrom`, `timeTo`; `limit`, `cursor`, `order`. |
+| GET    | `/v1/events/:id`                   | Event plus normalised transfer, when applicable.                                                                                                      |
+| GET    | `/v1/contracts/:contractId`        | Contract stats, event-name counts, recent events and transfers.                                                                                       |
+| GET    | `/v1/contracts/:contractId/events` | Contract event stream with the same filters.                                                                                                          |
+| GET    | `/v1/token-transfers`              | SEP-41 transfers by `contractId`, `from`, `to`, `asset`.                                                                                              |
+| GET    | `/v1/transactions/:txHash`         | Transaction fee/resource metadata and all events in the transaction.                                                                                  |
+| GET    | `/v1/ledgers/:sequence`            | Per-ledger counts and fees charged.                                                                                                                   |
+| GET    | `/v1/search?q=`                    | Contract ID, transaction hash, ledger sequence or event ID.                                                                                           |
+| GET    | `/v1/health`                       | Index freshness and API health.                                                                                                                       |
 
 Paginated responses are `{ "nodes": [...], "pageInfo": { "endCursor", "hasNextPage" } }`.
 
@@ -166,25 +166,25 @@ Responses are validated with zod and exposed as TypeScript types
 
 ## Configuration
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `PORT` | `4000` | HTTP port. |
-| `HOST` | `0.0.0.0` | Bind address. |
-| `DATABASE_URL` | `sqlite:./data/sorex-read.db` | PostgreSQL URL or `sqlite:path`. |
-| `STORAGE_DRIVER` | inferred from URL | `postgres` or `sqlite`. |
-| `REDIS_URL` | – | Optional Redis for shared response caching. |
-| `CORS_ORIGIN` | `*` | Comma-separated allowed origins, or `*`. |
-| `RATE_LIMIT_MAX` | `120` | Requests per window per IP/API key. |
-| `RATE_LIMIT_WINDOW` | `1 minute` | Rate-limit window. |
-| `MAX_PAGE_SIZE` | `100` | Hard page-size cap. |
-| `CACHE_TTL_MS` | `5000` | Hot-query cache TTL; `0` disables caching. |
-| `CACHE_MAX_ITEMS` | `500` | LRU capacity. |
-| `QUERY_DEPTH_LIMIT` | `8` | GraphQL selection depth cap. |
-| `QUERY_COMPLEXITY_LIMIT` | `300` | Maximum selected fields per document. |
-| `SUBSCRIPTION_POLL_MS` | `1000` | Polling interval for subscription feed. |
-| `METRICS_ENABLED` | `true` | Expose Prometheus `/metrics`. |
-| `NETWORK` | `testnet` | Label in health responses (`testnet`, `mainnet`, …). |
-| `LOG_LEVEL` | `info` | pino level. |
+| Variable                 | Default                       | Description                                          |
+| ------------------------ | ----------------------------- | ---------------------------------------------------- |
+| `PORT`                   | `4000`                        | HTTP port.                                           |
+| `HOST`                   | `0.0.0.0`                     | Bind address.                                        |
+| `DATABASE_URL`           | `sqlite:./data/sorex-read.db` | PostgreSQL URL or `sqlite:path`.                     |
+| `STORAGE_DRIVER`         | inferred from URL             | `postgres` or `sqlite`.                              |
+| `REDIS_URL`              | –                             | Optional Redis for shared response caching.          |
+| `CORS_ORIGIN`            | `*`                           | Comma-separated allowed origins, or `*`.             |
+| `RATE_LIMIT_MAX`         | `120`                         | Requests per window per IP/API key.                  |
+| `RATE_LIMIT_WINDOW`      | `1 minute`                    | Rate-limit window.                                   |
+| `MAX_PAGE_SIZE`          | `100`                         | Hard page-size cap.                                  |
+| `CACHE_TTL_MS`           | `5000`                        | Hot-query cache TTL; `0` disables caching.           |
+| `CACHE_MAX_ITEMS`        | `500`                         | LRU capacity.                                        |
+| `QUERY_DEPTH_LIMIT`      | `8`                           | GraphQL selection depth cap.                         |
+| `QUERY_COMPLEXITY_LIMIT` | `300`                         | Maximum selected fields per document.                |
+| `SUBSCRIPTION_POLL_MS`   | `1000`                        | Polling interval for subscription feed.              |
+| `METRICS_ENABLED`        | `true`                        | Expose Prometheus `/metrics`.                        |
+| `NETWORK`                | `testnet`                     | Label in health responses (`testnet`, `mainnet`, …). |
+| `LOG_LEVEL`              | `info`                        | pino level.                                          |
 
 ## Development
 
