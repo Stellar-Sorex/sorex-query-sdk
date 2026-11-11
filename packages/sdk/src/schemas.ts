@@ -112,6 +112,16 @@ export const ledgerSchema = z.object({
 });
 export type SorexLedger = z.infer<typeof ledgerSchema>;
 
+export const searchResultSchema = z.object({
+  query: z.string(),
+  contract: contractSchema.nullable(),
+  transaction: transactionSchema.nullable(),
+  events: z.array(eventSchema),
+  ledger: ledgerSchema.nullable(),
+  contracts: z.array(contractSchema),
+});
+export type SorexSearchResult = z.infer<typeof searchResultSchema>;
+
 export const healthSchema = z.object({
   status: z.string(),
   network: z.string(),

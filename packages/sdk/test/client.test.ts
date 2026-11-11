@@ -40,11 +40,33 @@ describe("SorexClient", () => {
 
   beforeAll(async () => {
     server = createServer(async (request: IncomingMessage, response: ServerResponse) => {
+      response.setHeader("content-type", "application/json");
+      if (request.method === "GET" && request.url?.startsWith("/v1/search")) {
+        response.end(
+          JSON.stringify({
+            query: "CDLZ",
+            contract: {
+              contractId: EVENT.contractId,
+              firstSeenLedger: EVENT.ledger,
+              lastSeenLedger: EVENT.ledger,
+              eventCount: 20,
+              transferCount: 20,
+              latestLedger: EVENT.ledger,
+              eventNames: [{ name: "transfer", count: 20 }],
+            },
+            transaction: null,
+            events: [EVENT],
+            ledger: null,
+            contracts: [],
+          }),
+        );
+        return;
+      }
+
       let raw = "";
       for await (const chunk of request) raw += String(chunk);
       const body = JSON.parse(raw) as CapturedRequest;
       requests.push(body);
-      response.setHeader("content-type", "application/json");
 
       if (request.url !== "/graphql") {
         response.statusCode = 404;
@@ -261,6 +283,12 @@ describe("SorexClient", () => {
       indexedEvents: 20,
       version: "0.1.0",
     });
+  });
+
+  it("searches across resources through REST", async () => {
+    const result = await client.search("CDLZ");
+    expect(result.contract?.contractId).toBe(EVENT.contractId);
+    expect(result.events[0]).toMatchObject({ id: EVENT.id });
   });
 
   it("maps HTTP and GraphQL failures to SorexApiError", async () => {

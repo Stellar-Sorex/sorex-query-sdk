@@ -17,6 +17,7 @@ import {
   eventSchema,
   healthSchema,
   ledgerSchema,
+  searchResultSchema,
   tokenTransferConnectionSchema,
   tokenTransferSchema,
   transactionSchema,
@@ -25,6 +26,7 @@ import {
   type SorexEventConnection,
   type SorexHealth,
   type SorexLedger,
+  type SorexSearchResult,
   type SorexTokenTransferConnection,
   type SorexTransaction,
 } from "./schemas.js";
@@ -200,6 +202,64 @@ export class SorexClient {
     this.ledgers = {
       get: (sequence) => this.#ledger(sequence),
     };
+  }
+
+  /**
+   * Search contracts, transactions, ledgers and events with the REST search
+   * endpoint. Accepts a contract ID, transaction hash, ledger sequence or event
+   * ID; other values match contract IDs by prefix.
+   */
+  async search(query: string): Promise<SorexSearchResult> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.#timeoutMs);
+    timer.unref?.();
+    const url = new URL(`${this.#httpUrl}/v1/search`);
+    url.searchParams.set("q", query);
+
+    let response: Response;
+    try {
+      response = await this.#fetch(url, {
+        headers: {
+          accept: "application/json",
+          ...(this.#apiKey ? { "x-api-key": this.#apiKey } : {}),
+          ...this.#headers,
+        },
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new SorexApiError(`Request timed out after ${this.#timeoutMs}ms`, {
+          code: "TIMEOUT",
+          cause: error,
+        });
+      }
+      throw new SorexApiError("Could not reach the Sorex API", {
+        code: "NETWORK_ERROR",
+        cause: error,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    const payload = (await response.json().catch(() => null)) as {
+      error?: { message?: string; code?: string };
+    } | null;
+    if (!response.ok) {
+      throw new SorexApiError(payload?.error?.message ?? `API returned HTTP ${response.status}`, {
+        status: response.status,
+        code: payload?.error?.code ?? "HTTP_ERROR",
+        details: payload,
+      });
+    }
+    try {
+      return searchResultSchema.parse(payload);
+    } catch (error) {
+      throw new SorexApiError("API response did not match the expected schema", {
+        code: "INVALID_RESPONSE",
+        details: error,
+        cause: error,
+      });
+    }
   }
 
   async health(): Promise<SorexHealth> {
